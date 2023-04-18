@@ -4,10 +4,11 @@
 #include <math.h>
 #include <string>
 #include <fstream>
+#include <stack>
 //cbkmyst rjvgjytyns? rjvgjytyns cbkmyjq cdzpyjcnb
 float x0_ = -2, x1_ = 2, y0_ = -2, y1_ = 2, dx = 0.5, dy = 0.5, a = 0, b = 0;
-//const unsigned int N = 50; для отображения
-unsigned int N, N_SCAN, col, row, cages;
+const unsigned int N = 64; //для отображения
+unsigned int N_SCAN, col, row, cages;
 
 using std::cout, std::cin, std::endl, std::string;
 
@@ -53,25 +54,33 @@ void input_params() {
     if (input != "") {
         dy = atof(input.c_str());
     }
-    N = (x1_ - x0_)/dx*(y1_ - y0_)/dy;
+//    N = (x1_ - x0_)/dx*(y1_ - y0_)/dy;
     N_SCAN = 5;
     col = (x1_ - x0_) / dx;
     row = (y1_ - y0_) / dy;
     cages = col * row;
 }
 
-void write_graph(std::vector<std::vector<int>> graph) {
+void write_graph(int graph[][N]) {
     std::ofstream file;
     file.open("obraz.txt");
-    for(auto it_vector = graph.begin(); it_vector != graph.end(); it_vector++) {
-        file << (*it_vector)[0] + 1 << ": ";
-        for (auto it = ++(*it_vector).begin(); *it != -1; it++) {
-            file << *it << " ";
+    for(int i = 0; i < N; i++) {
+        file << graph[i][0] << ": ";
+        for(int j = 1; graph[i][j] != -1 && j < N; j++) {
+            file << graph[i][j] << " ";
         }
-        file << '\n';
+        file << endl;
     }
+//    for(auto it_vector = graph.begin(); it_vector != graph.end(); it_vector++) {
+//        file << (*it_vector)[0] + 1 << ": ";
+        // for (auto it = ++(*it_vector).begin(); *it != -1; it++) {
+        //     file << *it << " ";
+        // }
+//        file << '\n';
+//  }
     file.close();
 }
+
 float get_x(float x, float y) {
     return x*x - y*y + a;
 }
@@ -109,11 +118,16 @@ int main() {
     // std::vector<Point> points;
     // points.push_back(Point{0.1, 0.2}); //emplace_back
     input_params();
-    std::vector<std::vector<int>> graph(N, std::vector<int>(N, -1));
+    int graph[N][N];
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            graph[i][j] = -1;
+        }
+    }
     h_x = dx/N_SCAN;
     h_y = dy/N_SCAN;
 
-    for (int i = 0, j = 0; i < N; graph[i++][0] = j++) {
+    for (int i = 0, j = 0; i < N; graph[i++][0] = ++j) {
         start_point.x = x0_ + ((i % 8) - (i != 0)) * dx;
         start_point.y = y0_ + (i / 8) * dy;
 
@@ -142,7 +156,6 @@ int main() {
         // for (auto j : result_cells) {
         //     cout << j << ", ";
         // }
-        cout << endl;
 
         result_cells.clear();
 
@@ -151,6 +164,45 @@ int main() {
     //нужно запихнуть в цикл
     return 0;
 }
+
+std::stack<unsigned int> stack;
+std::set<unsigned int> returnable;
+int color[N];
+void dfs(int graph[][N], int now) {
+    color[now] = 1;
+    int neig;
+    for(int i = 0; (neig = graph[now][i]) != -1; i++) {
+        if (color[neig] == 0) {
+            stack.push(now);
+            dfs(graph, neig);
+        }
+        else if (color[neig] == 1) {
+            //cycle
+            
+
+            for(unsigned int v = stack.top(); v != now; stack.pop(), v = stack.top()) {
+                returnable.insert(v);
+            }
+        }
+    }
+    stack.pop();
+    color[now] = 2;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

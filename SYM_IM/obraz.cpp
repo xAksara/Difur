@@ -61,12 +61,12 @@ void input_params() {
     cages = col * row;
 }
 
-void write_graph(int graph[][N]) {
+void write_graph(int graph[][N+1]) {
     std::ofstream file;
     file.open("obraz.txt");
-    for(int i = 0; i < N; i++) {
+    for(int i = 1; i <= N; i++) {
         file << graph[i][0] << ": ";
-        for(int j = 1; graph[i][j] != -1 && j < N; j++) {
+        for(int j = 1; graph[i][j] != -1 && j <= N; j++) {
             file << graph[i][j] << " ";
         }
         file << endl;
@@ -108,6 +108,9 @@ struct Point {
     float x, y;
 };
 
+void dfs(int graph[][N+1], int now);
+void print_returnable();
+
 int main() {
     float x, y, b, c, h_x, h_y;
     unsigned int a, cur_cell;
@@ -118,16 +121,16 @@ int main() {
     // std::vector<Point> points;
     // points.push_back(Point{0.1, 0.2}); //emplace_back
     input_params();
-    int graph[N][N];
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
+    int graph[N+1][N+1];
+    for (int i = 0; i <= N; i++) {
+        for (int j = 0; j <= N; j++) {
             graph[i][j] = -1;
         }
     }
     h_x = dx/N_SCAN;
     h_y = dy/N_SCAN;
 
-    for (int i = 0, j = 0; i < N; graph[i++][0] = ++j) {
+    for (int i = 0, j = 0; i < N; graph[++i][0] = ++j) {
         start_point.x = x0_ + ((i % 8) - (i != 0)) * dx;
         start_point.y = y0_ + (i / 8) * dy;
 
@@ -151,7 +154,7 @@ int main() {
 
         int k = 0;
         for (std::set <unsigned int> :: iterator it = result_cells.begin(); it != result_cells.end(); it++) {
-            graph[i][++k] = *it;
+            graph[i+1][++k] = *it;
         } 
         // for (auto j : result_cells) {
         //     cout << j << ", ";
@@ -161,32 +164,44 @@ int main() {
 
     }
     write_graph(graph);
+    for(int i = 1; i <= N; i++) {
+        dfs(graph, i);
+    }
+    print_returnable();
     //нужно запихнуть в цикл
     return 0;
 }
 
-std::stack<unsigned int> stack;
+std::vector<unsigned int> road;
 std::set<unsigned int> returnable;
-int color[N];
-void dfs(int graph[][N], int now) {
+int color[N + 1];
+
+void dfs(int graph[][N+1], int now) {
     color[now] = 1;
+    road.push_back(now);
     int neig;
-    for(int i = 0; (neig = graph[now][i]) != -1; i++) {
+    for(int i = 1; (neig = graph[now][i]) != -1; i++) {
         if (color[neig] == 0) {
-            stack.push(now);
+            road.push_back(now);
             dfs(graph, neig);
         }
         else if (color[neig] == 1) {
             //cycle
-            
-
-            for(unsigned int v = stack.top(); v != now; stack.pop(), v = stack.top()) {
-                returnable.insert(v);
+            for(auto v = road.end(); *v != neig; v--) {
+                returnable.insert(*v);
             }
         }
     }
-    stack.pop();
     color[now] = 2;
+    road.pop_back();
+}
+
+void print_returnable() {
+    cout << "возвр" << endl;
+    for (auto i : returnable) {
+        cout << i << ", ";
+    }
+    cout << endl;
 }
 
 

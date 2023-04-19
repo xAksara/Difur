@@ -1,8 +1,14 @@
+#ifndef _AKS_GRAPH_H_
+#define _AKS_GRAPH_H_ 1
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <set>
 #include "aks_graph.cpp"
 
-void write_graph(int** graph);
-
-void dfs(int** graph, int now);
+void write_graph(vertex** graph);
+void dfs(vertex** graph, int now);
 void print_returnable();
-void del_color();
-bool is_visited(unsigned int v);
+void clear_color();
+
+#endif

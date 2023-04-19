@@ -1,10 +1,7 @@
 #include <iostream>
-#include <vector>
 #include <set>
 #include <math.h>
-#include <string>
-#include <fstream>
-#include <stack>
+#include "aks_graph.h"
 //cbkmyst rjvgjytyns? rjvgjytyns cbkmyjq cdzpyjcnb
 float x0_ = -2, x1_ = 2, y0_ = -2, y1_ = 2, dx = 0.5, dy = 0.5, a = 0, b = 0;
  //для отображения
@@ -61,35 +58,15 @@ void input_params() {
     cages = col * row;
 }
 
-void write_graph(int graph[][N+1]) {
-    std::ofstream file;
-    file.open("files/obraz.txt");
-    for(int i = 1; i <= N; i++) {
-        file << graph[i][0] << ": ";
-        for(int j = 1; graph[i][j] != -1 && j <= N; j++) {
-            file << graph[i][j] << " ";
-        }
-        file << endl;
-    }
-//    for(auto it_vector = graph.begin(); it_vector != graph.end(); it_vector++) {
-//        file << (*it_vector)[0] + 1 << ": ";
-        // for (auto it = ++(*it_vector).begin(); *it != -1; it++) {
-        //     file << *it << " ";
-        // }
-//        file << '\n';
-//  }
-    file.close();
-}
-
-float get_x(float x, float y) {
+inline float get_x(float x, float y) {
     return x*x - y*y + a;
 }
 
-float get_y(float x, float y) {
+inline float get_y(float x, float y) {
     return 2*x*y + b;
 }
 // у - у0 округляет гавно
-unsigned int get_cell(float x, float y) {
+inline unsigned int get_cell(float x, float y) {
 
     int col_count = (x - x0_)/dx + (x != x1_);
     int row_count = (y - y0_)/dy - (y == y1_); 
@@ -108,11 +85,6 @@ struct Point {
     float x, y;
 };
 
-void dfs(int graph[][N+1], int now);
-void print_returnable();
-void del_color();
-bool is_visited(unsigned int v);
-
 int main() {
     float x, y, b, c, h_x, h_y;
     unsigned int a, cur_cell;
@@ -124,20 +96,20 @@ int main() {
     // points.push_back(Point{0.1, 0.2}); //emplace_back
     input_params();
 
-    int **graph = new int* [N+1];
+    vertex **graph = new vertex* [N+1];
     for (int i = 0; i <= N; i++) {
-        graph[i] = new int [N+1];
+        graph[i] = new vertex [N+1];
         for (int j = 0; j <= N; j++) {
-            graph[i][j] = -1;
+            graph[i][j].num = -1;
         }
     }
-    int graph[N+1][N+1];
+
     for (int i = 0; i <= N; i++) {
     }
     h_x = dx/N_SCAN;
     h_y = dy/N_SCAN;
 
-    for (int i = 0, j = 0; i < N; graph[++i][0] = ++j) {
+    for (int i = 0, j = 0; i < N; graph[++i][0].num = ++j) {
         start_point.x = x0_ + ((i % 8) - (i != 0)) * dx;
         start_point.y = y0_ + (i / 8) * dy;
 
@@ -158,150 +130,28 @@ int main() {
         }        
         end_loop:
 
-
         int k = 0;
         for (std::set <unsigned int> :: iterator it = result_cells.begin(); it != result_cells.end(); it++) {
-            graph[i+1][++k] = *it;
+            graph[i+1][++k].num = *it;
         } 
-        // for (auto j : result_cells) {
-        //     cout << j << ", ";
-        // }
-
         result_cells.clear();
-
     }
+
     write_graph(graph);
     int j = 0;
-    for(int i = 1; i <= N; del_color(), i++) {
-        if (!is_visited(i)) {
+    for(int i = 1; i <= N; clear_color(), i++) {
+        if (!vert[i].visited) {
             dfs(graph, i);
             j++;
         }
     }
     print_returnable();
-    //нужно запихнуть в цикл
-    return 0;
-}
 
-std::vector<unsigned int> road;
-std::set<unsigned int> returnable;
-int color[N + 1];
-int visited[N + 1];
-void del_color() {
-    for (int i = 1; i <= N; i++) {
-        color[i] = 0;
+    for (int i = 0; i <= N; i++) {
+        delete[] graph[i];
     }
-}
-
-void dfs(int graph[][N+1], int now) {
-    color[now] = 1;
-    road.push_back(now);
-    int neig;
-    if (visited[now] == 0) visited[now]++;
-
-    for(int i = 1; (neig = graph[now][i]) != -1; i++) {
-        if (color[neig] == 0) {
-            dfs(graph, neig);
-        }
-        else if (color[neig] == 1) {
-            //cycle
-            cout << endl << "cycle from " << neig << endl;
-            for(auto v = road.end() - 1; *v != neig; v--) {
-                returnable.insert(*v);
-                cout << *v << ", ";
-            }
-            cout << endl;
-        }
-    }
-    color[now] = 2;
-    road.pop_back();
-}
-
-void print_returnable() {
-    cout << "возвр" << endl;
-    for (auto i : returnable) {
-        cout << i << ", ";
-    }
-    cout << endl;
-}
-
-bool is_visited(unsigned int v) {
-    return visited[v];
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    for (int i = 0; i < N; i++) {
-        cur_cell = get_cell(points[i].x, points[i].y);
-
-        start_point.x = x0_ + ((cur_cell % 8) - 1) * dx;
-        start_point.y = y0_ + (cur_cell / 8) * dy;
-
-//        start_point.x = ((int)((points[i].x - x0_) / dx)) * dx + x0_ - (points[i].x == x1_) * dx;
-//        start_point.y = ((int)((points[i].y - y0_) / dy)) * dy + y0_ - (points[i].y == y1_) * dx;
-
-        for (unsigned j = 0; j < N_SCAN; j++) {
-            scan_point.x = start_point.x + h_x/2 + j*h_x;
-            for (unsigned k = 0; k < N_SCAN; k++) {
-                scan_point.y = start_point.y + h_y/2 + k*h_y;
-
-                temp_point.x = get_x(scan_point.x, scan_point.y);
-                temp_point.y = get_y(scan_point.x, scan_point.y);
-
-                if (temp_point.x > x1_ || temp_point.x < x0_ || temp_point.y > y1_ || temp_point.y < y0_) goto end_loop;
-
-                a = get_cell(temp_point.x, temp_point.y);
-                result_cells.insert(a);
-            }
-        }
-        
-        end_loop:
-        if (result_cells.empty()) {
-            cout << "scan image out of field" << endl;
-            return 0;
-        }
-
-        cout << "(" << points[i].x << ", " << points[i].y << ")" << " -> (" << scan_point.x << ",  " << scan_point.y << " ) in cell " << cur_cell     << " -> ";
-
-        for (std::set <unsigned int> :: iterator it = result_cells.begin(); it != result_cells.end(); it++) {
-            cout << *it << ", ";
-        } 
-        cout << endl;
-
-        x = get_x(points[i].x, points[i].y);
-        y = get_y(points[i].x, points[i].y);
-
-        if (x < x0_ || x > x1_ || y < y0_ || y > y1_ || x == points[i].x && y == points[i].y) {
-            cout << "point already were or out of field" << endl;
-            break;
-        }
-
-        if (x == y || y == 0) {
-            cout << "x == y == 0" << endl;
-            return 1;
-        }
-
-        points.push_back(Point{x, y});
-        result_cells.clear();
-    }
+    delete[] graph;
+    delete[] vert;
 
     return 0;
 }
-
-*/

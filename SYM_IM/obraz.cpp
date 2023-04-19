@@ -7,8 +7,8 @@
 #include <stack>
 //cbkmyst rjvgjytyns? rjvgjytyns cbkmyjq cdzpyjcnb
 float x0_ = -2, x1_ = 2, y0_ = -2, y1_ = 2, dx = 0.5, dy = 0.5, a = 0, b = 0;
-const unsigned int N = 64; //для отображения
-unsigned int N_SCAN, col, row, cages;
+ //для отображения
+unsigned int N, N_SCAN, col, row, cages;
 
 using std::cout, std::cin, std::endl, std::string;
 
@@ -54,7 +54,7 @@ void input_params() {
     if (input != "") {
         dy = atof(input.c_str());
     }
-//    N = (x1_ - x0_)/dx*(y1_ - y0_)/dy;
+    N = (x1_ - x0_)/dx*(y1_ - y0_)/dy;
     N_SCAN = 5;
     col = (x1_ - x0_) / dx;
     row = (y1_ - y0_) / dy;
@@ -63,7 +63,7 @@ void input_params() {
 
 void write_graph(int graph[][N+1]) {
     std::ofstream file;
-    file.open("obraz.txt");
+    file.open("files/obraz.txt");
     for(int i = 1; i <= N; i++) {
         file << graph[i][0] << ": ";
         for(int j = 1; graph[i][j] != -1 && j <= N; j++) {
@@ -110,6 +110,8 @@ struct Point {
 
 void dfs(int graph[][N+1], int now);
 void print_returnable();
+void del_color();
+bool is_visited(unsigned int v);
 
 int main() {
     float x, y, b, c, h_x, h_y;
@@ -121,11 +123,16 @@ int main() {
     // std::vector<Point> points;
     // points.push_back(Point{0.1, 0.2}); //emplace_back
     input_params();
-    int graph[N+1][N+1];
+
+    int **graph = new int* [N+1];
     for (int i = 0; i <= N; i++) {
+        graph[i] = new int [N+1];
         for (int j = 0; j <= N; j++) {
             graph[i][j] = -1;
         }
+    }
+    int graph[N+1][N+1];
+    for (int i = 0; i <= N; i++) {
     }
     h_x = dx/N_SCAN;
     h_y = dy/N_SCAN;
@@ -164,8 +171,12 @@ int main() {
 
     }
     write_graph(graph);
-    for(int i = 1; i <= N; i++) {
-        dfs(graph, i);
+    int j = 0;
+    for(int i = 1; i <= N; del_color(), i++) {
+        if (!is_visited(i)) {
+            dfs(graph, i);
+            j++;
+        }
     }
     print_returnable();
     //нужно запихнуть в цикл
@@ -175,21 +186,31 @@ int main() {
 std::vector<unsigned int> road;
 std::set<unsigned int> returnable;
 int color[N + 1];
+int visited[N + 1];
+void del_color() {
+    for (int i = 1; i <= N; i++) {
+        color[i] = 0;
+    }
+}
 
 void dfs(int graph[][N+1], int now) {
     color[now] = 1;
     road.push_back(now);
     int neig;
+    if (visited[now] == 0) visited[now]++;
+
     for(int i = 1; (neig = graph[now][i]) != -1; i++) {
         if (color[neig] == 0) {
-            road.push_back(now);
             dfs(graph, neig);
         }
         else if (color[neig] == 1) {
             //cycle
-            for(auto v = road.end(); *v != neig; v--) {
+            cout << endl << "cycle from " << neig << endl;
+            for(auto v = road.end() - 1; *v != neig; v--) {
                 returnable.insert(*v);
+                cout << *v << ", ";
             }
+            cout << endl;
         }
     }
     color[now] = 2;
@@ -202,6 +223,10 @@ void print_returnable() {
         cout << i << ", ";
     }
     cout << endl;
+}
+
+bool is_visited(unsigned int v) {
+    return visited[v];
 }
 
 

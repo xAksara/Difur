@@ -6,9 +6,9 @@
 #include <set>
 #include "aks_graph.cpp"
 
-void write_graph(vertex** graph);
-void dfs(vertex** graph, int now);
+void write_graph(vertex** graph, const unsigned int& N);
+void dfs(vertex** graph, int now, vertex* vert, const unsigned int& N);
 void print_returnable();
-void clear_color();
+void clear_color(vertex* vert, const unsigned int& N);
 
 #endif

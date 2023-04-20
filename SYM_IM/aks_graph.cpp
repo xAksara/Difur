@@ -1,7 +1,3 @@
-
-
-extern unsigned int N;
-
 using std::cout, std::cin, std::endl, std::string;
 
 struct vertex {
@@ -10,7 +6,7 @@ struct vertex {
     bool visited = 0;
 };
 
-void write_graph(vertex** graph) {
+void write_graph(vertex** graph, const unsigned int& N) {
     std::ofstream file;
     file.open("files/obraz.txt");
     for(int i = 1; i <= N; i++) {
@@ -26,9 +22,7 @@ void write_graph(vertex** graph) {
 std::vector<unsigned int> road;
 std::set<unsigned int> returnable;
 
-vertex* vert = new vertex[N+1];
-
-void dfs(vertex** graph, int now) {
+void dfs(vertex** graph, int now, vertex* vert, const unsigned int& N) {
     vert[now].color = 1;
     road.push_back(now);
     int neig;
@@ -36,7 +30,7 @@ void dfs(vertex** graph, int now) {
 
     for(int i = 1; (neig = graph[now][i].num) != -1; i++) {
         if (vert[neig].color == 0) {
-            dfs(graph, neig);
+            dfs(graph, neig, vert, N);
         }
         else if (vert[neig].color == 1) {
             cout << endl << "cycle: " << neig;
@@ -59,8 +53,9 @@ void print_returnable() {
     cout << endl;
 }
 
-void clear_color() {
+void clear_color(vertex* vert, const unsigned int& N) {
     for (int i = 1; i <= N; i++) {
         vert[i].color = 0;
     }
 }
+

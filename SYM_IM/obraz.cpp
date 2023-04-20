@@ -20,12 +20,11 @@ struct Point {
 
 int main() {
     input_params();
-    Point start_point;
-    Point scan_point;
-    Point temp_point;
+
+    Point start_point, scan_point, temp_point;
     std::set <unsigned int> result_cells;
     vertex* vert = new vertex[N+1];
-    vertex **graph = new vertex* [N+1];
+    vertex** graph = new vertex* [N+1];
     for (int i = 0; i <= N; i++) {
         graph[i] = new vertex [N+1];
         for (int j = 0; j <= N; j++) {
@@ -38,10 +37,10 @@ int main() {
         start_point.y = y0_ + (i / 8) * dy;
 
 
-        for (unsigned j = 0; j < N_SCAN; j++) {
-            scan_point.x = start_point.x + h_x/2 + j*h_x;
-            for (unsigned k = 0; k < N_SCAN; k++) {
-                scan_point.y = start_point.y + h_y/2 + k*h_y;
+        for (unsigned k = 0; k < N_SCAN; k++) {
+            scan_point.x = start_point.x + h_x/2 + k*h_x;
+            for (unsigned l = 0; l < N_SCAN; l++) {
+                scan_point.y = start_point.y + h_y/2 + l*h_y;
 
                 temp_point.x = get_x(scan_point.x, scan_point.y);
                 temp_point.y = get_y(scan_point.x, scan_point.y);
@@ -55,9 +54,7 @@ int main() {
         end_loop:
 
         int k = 0;
-        for (auto it : result_cells) {
-            graph[i+1][++k].num = it;
-        }
+        for (auto it : result_cells) graph[i+1][++k].num = it;
         result_cells.clear();
     }
 
@@ -69,9 +66,7 @@ int main() {
     }
     print_returnable();
 
-    for (int i = 0; i <= N; i++) {
-        delete[] graph[i];
-    }
+    for (int i = 0; i <= N; i++) delete[] graph[i];
     delete[] graph;
     delete[] vert;
 

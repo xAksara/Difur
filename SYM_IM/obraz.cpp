@@ -8,6 +8,7 @@ float a = 0, b = 0, h_x, h_y;
 unsigned int N, N_SCAN, col, row, cages;
 
 using std::cout, std::cin, std::endl, std::string;
+using namespace aks;
 
 void input_params();
 float get_x(float x, float y);
@@ -59,6 +60,7 @@ int main() {
     }
 
     write_graph(graph, N);
+    
     for(int i = 1; i <= N; clear_color(vert, N), i++) {
         if (!vert[i].visited) {
             dfs(graph, i, vert, N);

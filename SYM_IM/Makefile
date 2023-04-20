@@ -1,8 +1,8 @@
-obraz: obraz.o aks_graph.o
-	g++ obraz.o aks_graph.o -o obraz
+image: image.o aks_graph.o
+	g++ image.o aks_graph.o -o image
 
-obraz.o: obraz.cpp
-	gcc -c obraz.cpp
+image.o: image.cpp
+	gcc -c image.cpp
 
 aks_graph.o: aks_graph.cpp aks_graph.h
 	gcc -c aks_graph.cpp

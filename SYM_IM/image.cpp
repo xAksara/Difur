@@ -1,6 +1,9 @@
 #include <iostream>
 #include <set>
 #include <math.h>
+#include <stdio.h>
+#include <time.h> 
+
 #include "aks_graph.h"
 
 float x0_ = -2, x1_ = 2, y0_ = -2, y1_ = 2, dx = 0.5, dy = 0.5;
@@ -32,7 +35,7 @@ int main() {
             graph[i][j].num = -1;
         }
     }
-
+    clock_t start = clock();
     for (int i = 0, j = 0; i < N; graph[++i][0].num = ++j) {
         start_point.x = x0_ + ((i % 8) - (i != 0)) * dx;
         start_point.y = y0_ + (i / 8) * dy;
@@ -60,13 +63,16 @@ int main() {
     }
 
     write_graph(graph, N);
-    
+
     for(int i = 1; i <= N; clear_color(vert, N), i++) {
         if (!vert[i].visited) {
             dfs(graph, i, vert, N);
         }
     }
+    clock_t end = clock();
+    double seconds = (double)(end - start) / CLOCKS_PER_SEC;
     print_returnable();
+    cout << "Время работы: " << seconds << endl;
 
     for (int i = 0; i <= N; i++) delete[] graph[i];
     delete[] graph;
